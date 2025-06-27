@@ -16,20 +16,45 @@
     <script type="text/babel">
         const { useState } = React
 
+
+        function Modal({
+            title,
+            content,
+            show = false,
+            onClose = () => { },
+            onConfirm = () => { }
+        }) {
+            return show && ReactDOM.createPortal(
+                <div className="modal-container">
+                    <div className="modal">
+                        <h2>{title}</h2>
+                        {content}
+                        <div>
+                            <button onClick={onClose}>Annulla</button>
+                            <button onClick={onConfirm}>Conferma</button>
+                        </div>
+                    </div>
+                </div>,
+                document.body
+            )
+        }
+
         const ListaAnimali = () => {
 
-            const animalsChoices = ["Cane", "Gatto", "Pappagallo", "Cavallo", "Panda"];
             const [animals, setAnimals] = useState([])
+            const [show, setShow] = useState(false)
+            const [animalName, setAnimalName] = useState("")
 
             const addAnimal = () => {
-                const randomIndex = Math.floor(Math.random() * animalsChoices.length)
-                const randomAnimal = animalsChoices[randomIndex]
-                setAnimals(curr => [...curr, randomAnimal])
+                if (!animalName) return
+                setAnimals(curr => [...curr, animalName])
+                setAnimalName("")
+                setShow(false)
             }
 
             return (
                 <>
-                    <button onClick={addAnimal}>Aggiungi Animale</button>
+                    <button onClick={() => setShow(true)}>Aggiungi Animale</button>
                     <details>
                         <summary>
                             Animali
@@ -40,6 +65,19 @@
                             ))}
                         </ul>
                     </details>
+                    <Modal
+                        show={show}
+                        title="Inserisci un animale"
+                        onClose={() => setShow(false)}
+                        onConfirm={addAnimal}
+                        content={
+                            <input
+                                type="text"
+                                value={animalName}
+                                onChange={e => setAnimalName(e.target.value)}
+                            />
+                        }
+                    />
                 </>
             )
         }
@@ -73,19 +111,6 @@
 </html>
 
 <!-- 
-
-📌 Milestone 2: Aggiungere Animali Casuali
-Trasforma l’array animals usando useState (l’array è inizialmente vuoto).
-Aggiungi un bottone "Aggiungi Animale" sopra il <details>.
-Cliccando il bottone, un animale casuale viene aggiunto alla lista.
-Usa un array predefinito per scegliere casualmente:
-
-const animalsChoices = ["Cane", "Gatto", "Pappagallo", "Cavallo", "Panda"];
-
-L’animale selezionato deve essere aggiunto all’interno della lista <ul> come <li>.
-
-Obiettivo: L’utente può vedere gli animali aggiunti dinamicamente nella lista.
-
 📌 Milestone 3: Usare una Modale per Aggiungere Animali
 Partendo da questo componente Modal:
 function Modal({
